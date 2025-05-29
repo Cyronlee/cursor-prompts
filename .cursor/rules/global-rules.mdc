@@ -1,0 +1,7 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- this is a nextra document site
+- write .mdx files in /content folder

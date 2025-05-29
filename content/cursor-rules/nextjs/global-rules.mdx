@@ -1,0 +1,56 @@
+# Global Rules
+
+The global rules for Next.js, TypeScript, shadcn/ui
+
+```md
+# Project Rules
+
+## Framework & Technologies
+
+- Framework: Next.js
+- Language: TypeScript
+- Package Manager: pnpm
+- UI Library: shadcn/ui
+
+## Code Structure
+
+- Use the App Router pattern
+- Keep pages minimal, focusing on layout and data fetching
+- Place reusable components in `@/components/`
+- Group related components in subdirectories
+- Place utility functions in `@/lib/`
+- Store types and interfaces in `@/types/`
+- Place API routes in `@/app/api/`
+- Place API clients in `@/api-clients/`
+- Place custom hooks in `@/hooks/`
+
+## Naming Conventions
+
+- Files/Directories: Use kebab-case for file and directory names
+- Components: Use PascalCase for component names
+- Functions: Use camelCase for function names
+- Constants: Use UPPER_SNAKE_CASE for constants
+
+## TypeScript Usage
+
+- Always define explicit return types for functions
+- Use interfaces for object shapes instead of type aliases where possible
+- Avoid using `any` type - use proper typing or `unknown` if necessary
+
+## State Management
+
+- Use React hooks `useState` for simple component state
+- Consider using context for shared state across components
+- Keep state as close as possible to where it's used
+- Prefer client components
+
+## UI Styling
+
+- Use Tailwind CSS for styling components
+- Follow shadcn/ui patterns for consistent UI
+- Implement responsive design for all components
+
+## Quality Standards
+
+- Use ESLint and Prettier for code formatting
+```

@@ -1,0 +1,161 @@
+# API call
+
+The rules of frontend backend communication
+
+````md
+# Standardized Front-End and Back-End Communication Rules
+
+## Architecture Overview
+
+### Backend Layer
+
+- **API Routes**: Implemented in `@/app/api/` following RESTful design principles
+- **Error Handling**: Centralized error wrapper to standardize error responses
+- **Response Structure**: Consistent format for success and error responses
+
+### Frontend Layer
+
+- **API Client Core**: Base utility in `@/lib/api-client.ts` for handling HTTP requests
+- **API Client Modules**: Specific API clients in `@/api-clients/` folder
+- **Client Components**: Use API clients to interact with backend
+- **Error Handling**: Standardized error handling with toast notifications
+
+## Core Components Design
+
+### Backend Components
+
+#### API Routes
+
+- Route handlers should use the error wrapper
+- Example implementation:
+
+```typescript
+import { NextRequest } from "next/server";
+import { createSuccessResponse, withErrorHandling } from "../lib/error-wrapper";
+
+async function handleGet(req: NextRequest) {
+  // Process the request and return a response
+  return createSuccessResponse(data);
+}
+
+// Export the wrapped handler
+export const GET = withErrorHandling(handleGet);
+```
+
+### Frontend Components
+
+#### API Client Modules
+
+- Organized by domain in `/api-clients/`
+- Each module includes request/response interfaces and typed API methods
+- Example implementation:
+
+```typescript
+import { api, ApiResponse } from "@/lib/api-client";
+
+// Domain-specific interfaces
+export interface UserData {
+  id: string;
+  name: string;
+  email: string;
+}
+
+/**
+ * User API client for user-related operations
+ */
+export const userClient = {
+  getUser: async (userId: string): Promise<ApiResponse<UserData>> => {
+    return api.get<UserData>(`/users/${userId}`);
+  },
+
+  createUser: async (
+    userData: Omit<UserData, "id">
+  ): Promise<ApiResponse<UserData>> => {
+    return api.post<UserData>("/users", userData);
+  },
+
+  // Other methods...
+};
+```
+
+#### Client Components
+
+- Import and use API client modules
+- Handle UI feedback (loading states, toast notifications)
+- Implement error handling at the component level
+
+```typescript
+"use client";
+
+import { useState } from "react";
+import { userClient } from "@/api-clients/user-client";
+import { toast } from "sonner";
+
+export function UserProfile({ userId }: { userId: string }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleLoadUser = async () => {
+    setLoading(true);
+    try {
+      const response = await userClient.getUser(userId);
+
+      if (response.success && response.data) {
+        // Handle success with toast
+        toast.success("User loaded successfully");
+        // Update component state with user data
+      } else {
+        // Handle error with toast
+        toast.error("Failed to load user", {
+          description: response.error?.message || "Unknown error occurred",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Component rendering...
+}
+```
+
+## Communication Rules
+
+1. **Separation of Concerns**
+
+   - API client code should not contain UI-related code (toast, etc.)
+   - Toast notifications should only be used in client components
+   - API clients should focus on data fetching and standardization
+
+2. **Standardized Response Format**
+
+   - All API responses must follow the ApiResponse interface
+   - Success responses must include `success: true` and data
+   - Error responses must include `success: false` and error details
+
+3. **Error Handling**
+
+   - Backend errors should be caught and formatted by the error wrapper
+   - Frontend API client catches HTTP and response errors
+   - UI feedback for errors happens only in client components
+
+4. **Type Safety**
+
+   - Use TypeScript interfaces for request/response typing
+   - Avoid using `any` type where possible
+   - Define domain-specific types in API client modules
+
+5. **API Organization**
+   - Group related API routes by domain/feature
+   - Group related API client methods by domain/feature
+   - Use consistent naming conventions across backend and frontend
+
+## Data Flow
+
+1. User interacts with UI (button click, form submission)
+2. Client component calls appropriate API client method
+3. API client uses core client to make HTTP request
+4. Backend processes request through API route
+5. Response (success/error) is returned with proper structure
+6. API client processes and returns typed response
+7. Client component handles response and provides UI feedback
+````
